@@ -2,7 +2,6 @@ package VendingMachineLogic;
 import DatabaseConnection.DatabaseConnection;
 import model.Product;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 
 public class VendingMachine {
