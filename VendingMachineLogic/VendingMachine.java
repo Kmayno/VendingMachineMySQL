@@ -172,12 +172,16 @@ public class VendingMachine {
                 System.out.println("Codice non disponibile.");
             } else {
                 Product r=getProductFromDatabase(code);
+                if (r.getQuantity() <= 0) {
+                    System.out.println("Prodotto esaurito.");
+                    return;
+                }
                 if(credit>=r.getPrice()) {
                     String buyQuerySQL = "UPDATE products SET quantity = quantity-1 WHERE code=?";
                     try (Connection conn = DatabaseConnection.getConnection()) {
                         try (PreparedStatement stmt = conn.prepareStatement(buyQuerySQL)) {
                             stmt.setString(1,code);
-                            int row = stmt.executeUpdate();
+                            stmt.executeUpdate();
                             //metodo per aggiungere la trasazione al DB
                             addTransaction(r.getPrice());
                             setCredit(getCredit()-r.getPrice());
@@ -231,13 +235,13 @@ public class VendingMachine {
     }
 
         public void getRevenue(){
-            String queryRevenue="SELECT SUM(price) AS total_revenue FROM transactions";
+            String queryRevenue="SELECT SUM(revenue) AS total_revenue FROM transactions";
             try(Connection conn= DatabaseConnection.getConnection()){
                 try(Statement stmt = conn.createStatement()){
                     ResultSet rs = stmt.executeQuery(queryRevenue);
                     if (rs.next()){
                         double revenue = rs.getDouble("total_revenue");
-                        System.out.println("Guadagno totale: "+ revenue);
+                        System.out.println("Guadagno totale: "+ revenue+" €");
                     } else{
                         System.out.println("Nessun guadagno generato.");
                     }
